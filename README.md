@@ -1,50 +1,77 @@
 # _Study_StableViton
-In this repo, I am trying to Deeply understand and analysis of StableVITON (model &amp; paper). And find approaches to mimimalize its model size.
+In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableVITON](https://arxiv.org/abs/2312.01725) (model &amp; paper). And find approaches to mimimalize its model size.
 
-# [CVPR2024] StableVITON: Learning Semantic Correspondence with Latent Diffusion Model for Virtual Try-On 
-This repository is the official implementation of [StableVITON](https://arxiv.org/abs/2312.01725)
+[[The main Project Page](https://rlawjdghek.github.io/StableVITON/)]&nbsp;
 
-> **StableVITON: Learning Semantic Correspondence with Latent Diffusion Model for Virtual Try-On**<br>
-> [Jeongho Kim](https://scholar.google.co.kr/citations?user=4SCCBFwAAAAJ&hl=ko), [Gyojung Gu](https://www.linkedin.com/in/gyojung-gu-29033118b/), [Minho Park](https://pmh9960.github.io/), [Sunghyun Park](https://psh01087.github.io/), [Jaegul Choo](https://sites.google.com/site/jaegulchoo/)
-
-[[arXiv Paper](https://arxiv.org/abs/2312.01725)]&nbsp;
-[[Project Page](https://rlawjdghek.github.io/StableVITON/)]&nbsp;
-
-![teaser](assets/teaser.png)&nbsp;
+![teaser](assets/method_overview2.png)&nbsp;
 
 ## TODO List
 - [x] ~~Inference code~~
 - [x] ~~Release model weights~~
-- [x] ~~Training code~~
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
 
-## Environments
-```bash
-git clone https://github.com/rlawjdghek/StableVITON
-cd StableVITON
+## Solution Explanation 
 
-conda create --name StableVITON python=3.10 -y
-conda activate StableVITON
+The proposed solution looking to the problem as In-Painting problem. the Inpainting problem is well known in diffusion models as Paint-By-Example (PBE).
 
-# install packages
-pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117
-pip install pytorch-lightning==1.5.0
-pip install einops
-pip install opencv-python==4.7.0.72
-pip install matplotlib
-pip install omegaconf
-pip install albumentations
-pip install transformers==4.33.2
-pip install xformers==0.0.19
-pip install triton==2.0.0
-pip install open-clip-torch==2.19.0
-pip install diffusers==0.20.2
-pip install scipy==1.10.1
-conda install -c anaconda ipython -y
+## model understanding
+
+the model is consist of 
+(1) CLIP Image Encoder
+(3) UNET model
+(2) ControlNet 
+(4) Variational autoencoder (VAE)
+(5) conditional Latent diffusion model wrapper (CLDM)
+
+## model parts explanations
+
+### CLIP Image Encoder
+
+### TimeEmbedding UNET mode
+
+### ControlNet
+
+### Variational autoencoder (VAE)
+
+### conditional Latent diffusion model wrapper (CLDM)
+
+## Code flow
+
+- The image (3D channel) is first enter throught the Encoder of VAE to be out as 4D image in latent space with compromised size.
+
+- Then it pass throught the UNET model(implemented with time Embedding) so that it can predict the noise (eps).
+
+- The input to TimeEmbeddingUNET is (output of the encoder of the VAE + The out from CLIP image Encoder as **hint** + the Concat of agnostics+densepose as **Condition**) 
+
+- Thought time, the model learn how to remove the noise from the starting point (zt). And replace the mask (agnostic) area with the cloths in a way fitting the pose of the person.
+
+
+# Training Section
+## Download necessary weights for finetuning
+
+(1) download the weights,  The original weights needed for training is existed in this link [checkpoint](https://kaistackr-my.sharepoint.com/:f:/g/personal/rlawjdghek_kaist_ac_kr/EjzAZHJu9MlEoKIxG4tqPr0BM_Ry20NHyNw5Sic2vItxiA?e=5mGa1c).
+
+But to ease downloading process, Weights can be downloaded directly using the following commands
+
 ```
+download PBE: gdown 'https://drive.google.com/uc?export=download&id=12tk1e4PYKeD9JZ4FAa2uf_r-LfCf7Nsw'
 
-## Weights and Data
-Our [checkpoint](https://kaistackr-my.sharepoint.com/:f:/g/personal/rlawjdghek_kaist_ac_kr/EjzAZHJu9MlEoKIxG4tqPr0BM_Ry20NHyNw5Sic2vItxiA?e=5mGa1c) on VITONHD have been released! <br>
-You can download the VITON-HD dataset from [here](https://github.com/shadow2496/VITON-HD).<br>
+
+download VAE: gdown 'https://drive.google.com/uc?export=download&id=1cB1SMyn4QX8xQFvXaO98b7sjVefpBfR7'
+
+```
+### understand config file
+
+
+
+## Prepare Dataset
+If you are going to build you own dataset. You can follow [my Repo]() to prepare the dataset for Training.
+VITON-HD dataset can be download from [here](https://github.com/shadow2496/VITON-HD).<br>
 For both training and inference, the following dataset structure is required:
 
 ```
@@ -65,46 +92,6 @@ test
 |-- cloth
 |-- cloth_mask
 ```
-
-## Preprocessing
-The VITON-HD dataset serves as a benchmark and provides an agnostic mask. However, you can attempt virtual try-on on **arbitrary images** using segmentation tools like [SAM](https://github.com/facebookresearch/segment-anything). Please note that for densepose, you should use the same densepose model as used in VITON-HD.
-
-## Inference
-```bash
-#### paired
-CUDA_VISIBLE_DEVICES=4 python inference.py \
- --config_path ./configs/VITONHD.yaml \
- --batch_size 4 \
- --model_load_path <model weight path> \
- --save_dir <save directory>
-
-#### unpaired
-CUDA_VISIBLE_DEVICES=4 python inference.py \
- --config_path ./configs/VITONHD.yaml \
- --batch_size 4 \
- --model_load_path <model weight path> \
- --unpair \
- --save_dir <save directory>
-
-#### paired repaint
-CUDA_VISIBLE_DEVICES=4 python inference.py \
- --config_path ./configs/VITONHD.yaml \
- --batch_size 4 \
- --model_load_path <model weight path>t \
- --repaint \
- --save_dir <save directory>
-
-#### unpaired repaint
-CUDA_VISIBLE_DEVICES=4 python inference.py \
- --config_path ./configs/VITONHD.yaml \
- --batch_size 4 \
- --model_load_path <model weight path> \
- --unpair \
- --repaint \
- --save_dir <save directory>
-```
-
-You can also preserve the unmasked region by '--repaint' option. 
 
 ## Training
 For VITON training, we increased the first block of U-Net from 9 to 13 channels (add zero conv) based on the Paint-by-Example (PBE) model. Therefore, you should download the modified checkpoint (named as 'VITONHD_PBE_pose.ckpt') from the [Link](https://kaistackr-my.sharepoint.com/:f:/g/personal/rlawjdghek_kaist_ac_kr/EjzAZHJu9MlEoKIxG4tqPr0BM_Ry20NHyNw5Sic2vItxiA?e=5mGa1c) and place it in the './ckpts/' folder first.
@@ -129,18 +116,3 @@ CUDA_VISIBLE_DEVICES=5,6 python train.py \
  --save_name ATVloss_test
 ```
 
-## Citation
-If you find our work useful for your research, please cite us:
-```
-@artical{kim2023stableviton,
-    title={StableVITON: Learning Semantic Correspondence with Latent Diffusion Model for Virtual Try-On},
-    author={Kim, Jeongho and Gu, Gyojung and Park, Minho and Park, Sunghyun and Choo, Jaegul},
-    booktitle={arXiv preprint arxiv:2312.01725},
-    year={2023}
-}
-```
-
-**Acknowledgements** Sunghyun Park is the corresponding author.
-
-## License
-Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
