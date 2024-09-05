@@ -6,8 +6,8 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 ![teaser](assets/method_overview2.png)&nbsp;
 
 ## TODO List
-- [x] ~~Inference code~~
-- [x] ~~Release model weights~~
+- [ ] Solution Explanation
+- [ ] Model understanding
 - [ ] Sub models documentation
 - [ ] Model pretrained weights extraction from checkpoint 
 - [ ] Model size and training specs
@@ -20,7 +20,7 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 
 The proposed solution looking to the problem as In-Painting problem. the Inpainting problem is well known in diffusion models as Paint-By-Example (PBE).
 
-## model understanding
+## Model understanding
 
 the model is consist of 
 (1) CLIP Image Encoder
@@ -29,7 +29,7 @@ the model is consist of
 (4) Variational autoencoder (VAE)
 (5) conditional Latent diffusion model wrapper (CLDM)
 
-## model parts explanations
+## Model parts explanations
 
 ### CLIP Image Encoder
 
