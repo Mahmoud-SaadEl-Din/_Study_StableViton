@@ -8,12 +8,13 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 ## TODO List
 - [x] ~~Inference code~~
 - [x] ~~Release model weights~~
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] Sub models documentation
+- [ ] Model pretrained weights extraction from checkpoint 
+- [ ] Model size and training specs
+- [ ] Explain Paint-By-Example in DM (diffusion models) world 
+- [ ] Input to output flow throught model
+- [ ] Training Section
+- [ ] Special points mentioned in the Paper
 
 ## Solution Explanation 
 
@@ -40,7 +41,7 @@ the model is consist of
 
 ### conditional Latent diffusion model wrapper (CLDM)
 
-## Code flow
+## Input to output flow throught model
 
 - The image (3D channel) is first enter throught the Encoder of VAE to be out as 4D image in latent space with compromised size.
 
