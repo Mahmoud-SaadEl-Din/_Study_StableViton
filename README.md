@@ -7,39 +7,46 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 
 ## TODO List
 - [ ] Solution Explanation
+- [ ] Explain Paint-By-Example in DM (diffusion models) world
 - [ ] Model understanding
-- [ ] Sub models documentation
-- [ ] Model pretrained weights extraction from checkpoint 
-- [ ] Model size and training specs
-- [ ] Explain Paint-By-Example in DM (diffusion models) world 
+- [ ] Sub Model Understanding
 - [ ] Input to output flow throught model
+- [ ] Model pretrained weights extraction from checkpoint 
+- [ ] Model size and training specsf
 - [ ] Training Section
 - [ ] Special points mentioned in the Paper
 
 ## Solution Explanation 
+StableVITON approaches the problem as an inpainting task, which is common in diffusion models and closely related to Paint-By-Example (PBE). The model replaces missing parts (e.g., masked areas) with realistic clothing fitting the pose of the person using a guided approach with agnostic images and densepose.
 
-The proposed solution looking to the problem as In-Painting problem. the Inpainting problem is well known in diffusion models as Paint-By-Example (PBE).
+## Explain Paint-By-Example in DM (diffusion models) world
+Paint-By-Example (PBE) refers to using image inpainting techniques, where diffusion models generate or complete an image based on a specific masked region and an example image for guidance. In the Diffusion Model (DM) world, the process involves progressively denoising random noise to reconstruct the missing parts of an image, while ensuring that the missing region is filled according to the example provided. The goal is to maintain coherence with the original image’s context and the condition (example)
 
 ## Model understanding
 
 the model is consist of 
-(1) CLIP Image Encoder
-(3) UNET model
-(2) ControlNet 
-(4) Variational autoencoder (VAE)
-(5) conditional Latent diffusion model wrapper (CLDM)
+(1) CLIP Image Encoder: Provides semantic context from the reference image.
+(3) UNET model: Used for the noise prediction during denoising steps.
+(2) ControlNet: Guides the generation with structured cues.
+(4) Variational autoencoder (VAE): Encodes the input image into a latent representation.
+(5) conditional Latent diffusion model wrapper (CLDM): Generates the final output conditioned on the latent inputs.
 
-## Model parts explanations
+## Sub Model Understanding
 
 ### CLIP Image Encoder
+This module extracts semantic features from the input image that guide the generation process.
 
 ### TimeEmbedding UNET mode
+This UNET model works with temporal embeddings to predict noise during denoising steps, crucial in diffusion-based models.
 
 ### ControlNet
+ControlNet is used to incorporate structure guidance, ensuring the generated clothing adheres to the target pose and body structure.
 
 ### Variational autoencoder (VAE)
+The VAE encodes the input image into a lower-dimensional latent space, crucial for dimensionality reduction and compact representation.
 
 ### conditional Latent diffusion model wrapper (CLDM)
+The CLDM guides the entire diffusion process, conditioned on both the latent representations from the VAE and the structured cues from ControlNet.
 
 ## Input to output flow throught model
 
