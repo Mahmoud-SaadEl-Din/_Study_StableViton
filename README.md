@@ -6,14 +6,14 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 ![teaser](assets/method_overview2.png)&nbsp;
 
 ## TODO List
-- [ ] Solution Explanation
-- [ ] Explain Paint-By-Example in DM (diffusion models) world
-- [ ] Model understanding
+- [x] Solution Explanation
+- [x] Explain Paint-By-Example in DM (diffusion models) world
+- [x] Model understanding
 - [ ] Sub Model Understanding
-- [ ] Input to output flow throught model
+- [x] Input to output flow throught model
 - [ ] Model pretrained weights extraction from checkpoint 
 - [ ] Model size and training specsf
-- [ ] Training Section
+- [x] Training Section
 - [ ] Special points mentioned in the Paper
 
 ## Solution Explanation 
