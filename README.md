@@ -1,4 +1,4 @@
-# _Study_StableViton
+## _Study_StableViton
 In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableVITON](https://arxiv.org/abs/2312.01725) (model &amp; paper). And find approaches to mimimalize its model size.
 
 [[The main Project Page](https://rlawjdghek.github.io/StableVITON/)]&nbsp;
