@@ -9,10 +9,10 @@ In this repo, I am trying to Deeply understand and analysis of [CVPR2024-StableV
 - [x] Solution Explanation
 - [x] Explain Paint-By-Example in DM (diffusion models) world
 - [x] Model understanding
-- [ ] Sub Model Understanding
+- [x] Sub Model Understanding
 - [x] Input to output flow throught model
 - [ ] Model pretrained weights extraction from checkpoint 
-- [ ] Model size and training specsf
+- [x] Model size and training specsf
 - [x] Training Section
 - [ ] Special points mentioned in the Paper
 
@@ -222,14 +222,55 @@ In the context of image generation, the VAE compresses input images into a laten
 - In image generation tasks, the sampled latent vectors can be decoded back into high-quality reconstructions that closely resemble the original image but allow for controlled variation or modification based on user input.
 
 ### TimeEmbedding UNET mode
-This UNET model works with temporal embeddings to predict noise during denoising steps, crucial in diffusion-based models.
+**Why UNet is Used:**
+UNet is highly effective for image generation tasks because of its encoder-decoder structure with skip connections. The encoder captures spatial features by downsampling the input, while the decoder reconstructs the output, preserving spatial details through skip connections. This design is essential in diffusion models, where iterative noise removal is crucial.
 
+**Time Injection:**
+In diffusion models, the timestep (or noise level) is injected into the network through time embeddings. These embeddings provide the model with the current denoising step information, ensuring that each stage in the UNet pipeline is conditioned on this timestep. Temporal embeddings can be injected into the feature maps at various stages, such as concatenating them with the input or adding them to intermediate representations.
 
+**Comparison to Default UNet:**
+While a default UNet works without considering time or denoising steps, in diffusion models, TimeEmbedding UNet integrates the timestep into its layers. The time embedding introduces dynamic conditioning, altering how the model processes features at each timestep. This results in different noise predictions based on the denoising step, allowing for progressive image refinement during the diffusion process.
 
+**Why not to use Resnet instead of UNET:**
+Using ResNet for noise prediction instead of UNet has been considered, but UNet offers several advantages for diffusion models:
 
+    Spatial Resolution Preservation: UNet's skip connections allow it to preserve finer details by combining high-resolution features from the encoder with the decoder. This is crucial for high-quality image generation, while ResNet’s deeper architecture may lose spatial details during downsampling.
 
-### conditional Latent diffusion model wrapper (CLDM)
-The CLDM guides the entire diffusion process, conditioned on both the latent representations from the VAE and the structured cues from ControlNet.
+    Task-Specific Design: UNet is designed for dense prediction tasks (segmentation, noise removal), which are similar to the pixel-wise denoising needed in diffusion models. ResNet is optimized for classification and may not perform as effectively in pixel-wise tasks.
+
+    Efficiency in Diffusion Models: UNet’s structure provides a more direct method of denoising across multiple resolutions, where ResNet would require additional modifications to capture multiscale features.
+
+**Parameters Explanation:**
+
+    Time Embedding Layer:
+        Temporal embeddings represent the denoising timestep, allowing the model to understand which stage of the denoising process it's in.
+
+    Channels:
+        Defines the number of input/output channels at each stage of the UNet, often growing progressively deeper as features are downsampled.
+
+    Attention Layers:
+        Incorporates attention mechanisms into specific resolutions, focusing on important image regions at different scales.
+
+    Skip Connections:
+        From encoder to decoder, to preserve spatial features while progressively adding the noise estimate.
+
+**Model Architecture and Functionality:**
+
+    Time Embedding:
+        Injects temporal context into the model, usually through sinusoidal embeddings or learned embeddings, to help the model condition its noise prediction based on the current step in the denoising process.
+
+    UNet Backbone:
+        The model starts by encoding the noisy image into latent representations while integrating the time embeddings. Each level of the encoder downsamples the input and increases the channel dimensions to extract finer details.
+        The middle block processes the features with added time embedding influence.
+        The decoder upsamples the encoded representations, incorporating skip connections from the corresponding encoder layers, ensuring the noise estimate respects spatial structures.
+
+    Attention Layers:
+        Implemented in the network to enhance focus on critical parts of the image. It's especially effective in capturing long-range dependencies, further helping the model during denoising.
+
+    Output:
+        The model ultimately predicts the noise present in the image at the given timestep, enabling its removal in subsequent steps of the diffusion process.
+
+This structure ensures the UNet, equipped with temporal understanding, can progressively denoise images in a controlled manner over several steps.
 
 ## Input to output flow throught model
 
@@ -241,6 +282,25 @@ The CLDM guides the entire diffusion process, conditioned on both the latent rep
 
 - Thought time, the model learn how to remove the noise from the starting point (zt). And replace the mask (agnostic) area with the cloths in a way fitting the pose of the person.
 
+
+**Hints vs. Controls:**
+
+    Hints:
+        Hints refer to auxiliary data provided to guide the diffusion process. They are additional signals, such as edge maps, object segmentation, or depth information.
+        Hints don't strictly determine the output but guide the model in creating plausible results. In ControlNet, these hints (like a rough pose or a sketch) help the model structure the output.
+
+    Controls:
+        Controls are stronger conditions, often encoded as features from ControlNet or CLIP embeddings. These represent either structured constraints or semantic conditions like text prompts.
+        Controls are more deterministic than hints. They force the model to conform to specific attributes of the target, ensuring the output adheres to the provided conditioning in a strict way, such as a specific pose or high-level concept.
+
+
+
+## Model pretrained weights extraction from checkpoint 
+
+
+## Model size and training specsf
+
+the model parameters are 1 Billion parameters
 
 ## Training Section
 ### Download necessary weights for finetuning
@@ -256,8 +316,6 @@ download PBE: gdown 'https://drive.google.com/uc?export=download&id=12tk1e4PYKeD
 download VAE: gdown 'https://drive.google.com/uc?export=download&id=1cB1SMyn4QX8xQFvXaO98b7sjVefpBfR7'
 
 ```
-### Understand config file
-
 
 
 ## Prepare Dataset
